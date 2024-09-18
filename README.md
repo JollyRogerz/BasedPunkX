@@ -1,5 +1,5 @@
 <div align="center">
-    <h1>🔥BurntPunX</h1>
+    <h1>🔵Based PunkX</h1>
 </div>
 <br>
 <div align="center">
