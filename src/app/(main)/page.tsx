@@ -1,8 +1,8 @@
 import Frame from "@/components/layout/Frame";
 import MintDisplay from "@/components/layout/MintDisplay";
-import ConnectButton from "@/components/ConnectButton";
+import ConnectButton from "@/components/ui/ConnectButton";
 import { MinterProvider } from "@/components/contexts/MinterContext";
-import CollectionButton from "@/components/CollectionButton";
+import CollectionButton from "@/components/ui/CollectionButton";
 import MobileModal from "@/components/layout/MobileModal";
 
 export default function Page() {

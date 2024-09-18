@@ -29,8 +29,8 @@ export default function MobileModal() {
           onClick={() => setOpen(false)}
           className="self-center border justify-center text-center max-w-lg p-4 rounded-lg"
         >
-          <div className="cursive text-4xl">A Note From The Hoodie Cartel</div>
-          <div className="basker text-lg">
+          <div className="text-4xl">A Note From The Hoodie Cartel</div>
+          <div className="text-lg">
             Sorry for the inconvenience, but this mint is only available on
             desktop. Please visit us on a larger screen to mint.
           </div>

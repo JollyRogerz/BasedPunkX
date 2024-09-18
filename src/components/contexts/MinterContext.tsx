@@ -12,11 +12,9 @@ import {
 
 interface ContextProps {
   count: string;
-  chill: boolean;
   error: boolean;
   frameImage: string;
   setCount: Dispatch<SetStateAction<string>>;
-  setChill: Dispatch<SetStateAction<boolean>>;
   setError: Dispatch<SetStateAction<boolean>>;
   setFrameImage: Dispatch<SetStateAction<string>>;
 }
@@ -25,22 +23,19 @@ const MinterContext = createContext<ContextProps>({} as ContextProps);
 
 export const MinterProvider = ({ children }: { children: ReactNode }) => {
   const [count, setCount] = useState("1");
-  const [chill, setChill] = useState(false);
   const [error, setError] = useState(false);
   const [frameImage, setFrameImage] = useState("");
 
   const contextValue = useMemo(
     () => ({
       count,
-      chill,
       error,
       frameImage,
       setCount,
-      setChill,
       setError,
       setFrameImage,
     }),
-    [count, chill, error, frameImage]
+    [count, error, frameImage]
   );
 
   return (

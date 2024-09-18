@@ -1,39 +1,19 @@
 "use client";
-import MintButton from "@/components/MintButton";
+import MintButton from "@/components/ui/MintButton";
 import { AnimatePresence, motion } from "framer-motion";
 import { useMinter } from "../contexts/MinterContext";
 
 export default function MintDisplay() {
   return (
     <div className="flex gap-3 text-center text-goldtext-xs flex-wrap">
-      <LYXButton />
       <InputField />
       <MintButton />
-      {/* need this to have react know 
-      when the component leaves 
-      the view area to animate in/out */}
       <AnimatePresence>
         <Error />
       </AnimatePresence>
     </div>
   );
 }
-
-// swap minting between LYX and Chill
-const LYXButton = () => {
-  const { chill, setChill } = useMinter();
-
-  return (
-    <button
-      onClick={() => {
-        setChill(!chill);
-      }}
-      className="digital text-gold shrink-0 flex grow justify-center items-center border col-span-4 rounded-md text-right p-2"
-    >
-      {chill ? "6,969 Chill" : "4.2 LYX"}
-    </button>
-  );
-};
 
 // input field for minting amount
 const InputField = () => {

@@ -3,11 +3,11 @@
 @tailwind utilities;
 
 :root {
-  --color-primary: #cabd89;
-  --color-background: #000000;
-  --color-blue: #818c9e;
-  --color-purple: #9482a1;
-  --color-green: #aaa85e;
+  --color-primary: #9bbafc;
+  --color-background: #0052ff;
+  --color-blue: #346dc9;
+  --color-purple: #8842ba;
+  --color-green: #54afc8;
 }
 
 @font-face {
@@ -51,11 +51,11 @@ body {
 }
 
 .text-gold {
-  color: #cabd89;
+  color: #fafafa;
 }
 
 .gold {
-  background: -webkit-linear-gradient(#918863, #fffdb8);
+  background: -webkit-linear-gradient(#637591, #77c4ff);
 }
 
 .border {
@@ -119,8 +119,8 @@ body {
   left: 0;
   background: radial-gradient(
     ellipse at center,
-    rgba(0, 0, 0, 0) 0%,
-    rgba(0, 0, 0, 0.75) 100%
+    rgba(2, 54, 105, 0) 0%,
+    rgba(6, 10, 45, 0.75) 100%
   );
 }
 

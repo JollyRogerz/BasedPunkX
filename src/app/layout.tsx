@@ -6,7 +6,7 @@ import { Toaster } from "sonner";
 export const metadata: Metadata = {
   metadataBase: new URL("https://hoodiecartel.com"),
   title: "Hoodie Cartel",
-  description: "Home to the BurntPunX Collection and the Hoodie Cartel",
+  description: "Home to the BasedPunkX Collection and the Hoodie Cartel",
 };
 
 export default function RootLayout({

@@ -1,6 +1,6 @@
 "use client";
 
-import Counter from "@/components/Counter";
+import Counter from "@/components/ui/Counter";
 import { useMinter } from "../contexts/MinterContext";
 import Image from "next/image";
 export default function Frame() {

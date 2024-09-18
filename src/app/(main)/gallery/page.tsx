@@ -5,7 +5,7 @@ import GridItem from "@/components/layout/GridItem";
 import Image from "next/image";
 import { useAccount } from "wagmi";
 import { useEffect, useState } from "react";
-import ConnectButton from "@/components/ConnectButton";
+import ConnectButton from "@/components/ui/ConnectButton";
 import { Copy } from "@/utils/icons/copy";
 import { toast } from "sonner";
 

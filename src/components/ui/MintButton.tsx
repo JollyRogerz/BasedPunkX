@@ -1,6 +1,6 @@
 "use client";
 import { useAccount } from "wagmi";
-import { useMinter } from "./contexts/MinterContext";
+import { useMinter } from "../contexts/MinterContext";
 import { getEthersSigner } from "@/utils/web3";
 import { config } from "@/config/wagmi";
 import { ethers } from "ethers";

@@ -2,10 +2,10 @@
 const StayBundled = () => {
   return (
     <div className="font-serif">
-      <div className="-mb-2 cursive text-4xl">
-        <em>Stay Bundled</em>
+      <div className=" text-4xl">
+        <p>Stay Based</p>
       </div>
-      <div className="text-2xl">🤝🫳👌🫰🏻🤙🏻</div>
+      <div className="text-2xl">🔵 👨‍🎤</div>
     </div>
   );
 };

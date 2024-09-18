@@ -15,14 +15,12 @@ const config: HardhatUserConfig = {
     },
   },
   networks: {
-    testnet: {
-      chainId: 4201,
-      url: "https://rpc.testnet.lukso.network",
+    base: {
+      url: "https://mainnet.base.org",
       accounts: [process.env.PRIVATEKEY || '']
     },
-    mainnet: {
-      chainId: 42,
-      url: "https://rpc.mainnet.lukso.network",
+    baseSepolia: {
+      url: "https://sepolia.base.org",
       accounts: [process.env.PRIVATEKEY || '']
     },
   },

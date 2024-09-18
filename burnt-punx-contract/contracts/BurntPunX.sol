@@ -1,142 +1,282 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.19;
-/*
- * BurntPunX smart contract
+
+pragma solidity ^0.8.0;
+
+import "ERC20-NFT-Sale-with-Distributed-Royalties/@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "ERC20-NFT-Sale-with-Distributed-Royalties/@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "ERC20-NFT-Sale-with-Distributed-Royalties/@openzeppelin/contracts/access/Ownable.sol";
+import "ERC20-NFT-Sale-with-Distributed-Royalties/@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+import "ERC20-NFT-Sale-with-Distributed-Royalties/@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
+import "ERC20-NFT-Sale-with-Distributed-Royalties/@openzeppelin/contracts/utils/Strings.sol";
+
+/**
+ * @title NFT Sale with burnable NFTs, wallet cap and  distributed payout
+ * @author Breakthrough Labs Inc.
+ * @notice NFT, Sale, ERC721, Limited, Whitelist, Burnable
+ * @custom:version 1.0.3
+ * @custom:address 12
+ * @custom:default-precision 0
+ * @custom:simple-description NFT and whitelisted Sale, with burn functions to completely remove NFTs from circulation.
+ * @dev ERC721 NFT with the following features:
+ *
+ *  - Built-in sale with an adjustable price.
+ *  - Wallets can only purchase a limited number of NFTs during the sale.
+ *  - Reserve function for the owner to mint free NFTs.
+ *  - Fixed maximum supply.
+ *  - Methods that allow users to burn their NFTs. This directly decreases total supply.
+ *  - Proceeds can be divided across 5 wallets
+ *
  */
-/// modules
-import {LSP8IdentifiableDigitalAsset} from "@lukso/lsp-smart-contracts/contracts/LSP8IdentifiableDigitalAsset/LSP8IdentifiableDigitalAsset.sol";
-import {LSP8Enumerable} from "@lukso/lsp-smart-contracts/contracts/LSP8IdentifiableDigitalAsset/extensions/LSP8Enumerable.sol";
-import {LSP8IdentifiableDigitalAssetCore} from "@lukso/lsp-smart-contracts/contracts/LSP8IdentifiableDigitalAsset/LSP8IdentifiableDigitalAssetCore.sol";
 
-/// security
-import { ReentrancyGuard } from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
-import {Address} from "@openzeppelin/contracts/utils/Address.sol";
-
-/// interafces
-import {ILSP7DigitalAsset as ILSP7} from "@lukso/lsp-smart-contracts/contracts/LSP7DigitalAsset/ILSP7DigitalAsset.sol";
-
-/// constants
-import {_LSP4_TOKEN_TYPE_NFT, _LSP4_METADATA_KEY} from "@lukso/lsp-smart-contracts/contracts/LSP4DigitalAssetMetadata/LSP4Constants.sol";
-import {_LSP8_TOKENID_FORMAT_NUMBER, _LSP8_TOKEN_METADATA_BASE_URI} from "@lukso/lsp-smart-contracts/contracts/LSP8IdentifiableDigitalAsset/LSP8Constants.sol";
-
-/// errors
-import {LSP8NotTokenOperator} from "@lukso/lsp-smart-contracts/contracts/LSP8IdentifiableDigitalAsset/LSP8Errors.sol";
-
-/// errors
-error BPunxMintingLimitExceeded(uint256 _amount);
-error BPunxMintingPriceNotMet(uint256 _amount);
-error Unauthorized();
-
-contract BurntPunX is
-    LSP8IdentifiableDigitalAsset,
-    LSP8Enumerable,
-    ReentrancyGuard
+contract PunkX is
+    ERC721,
+    ERC721Enumerable,
+    ERC721Burnable,
+    Ownable
 {
-    uint256 public constant MAX_SUPPLY = 6900;
-    uint256 public constant TEAM_RESERVE = 169;
-    uint256 public constant MAX_MINTABLE = 100;
-    uint256 public constant PRICE = 4.2 ether;
-    uint256 public constant CHILLPRICE = 6969 ether;
+    address[] private payoutAddress;
+    uint256[] private payoutPercent;
+    // string private _baseURIextended;
+    string private _ipfsPrefix;
 
-    address constant CHILL_TOKEN_ADDRESS =
-        0x5B8B0E44D4719F8A328470DcCD3746BFc73d6B14;
-    bool public mintOpen = false;
 
-    ILSP7 _chillContract;
-    uint256 totalMinted;
+    uint256 public immutable MAX_SUPPLY;
 
-    constructor(bytes32[] memory _data, bytes[] memory _values)
-        LSP8IdentifiableDigitalAsset(
-            "Burnt PunX",
-            "BPUNX",
-            msg.sender,
-            _LSP4_TOKEN_TYPE_NFT,
-            _LSP8_TOKENID_FORMAT_NUMBER
-        )
-    {
-        _chillContract = ILSP7(CHILL_TOKEN_ADDRESS);
-        setDataBatch(_data, _values);
+    /// @custom:precision 18
+    uint256 public currentPrice;
+    uint256 public walletLimit;
+
+    bool public saleIsActive = true;
+    bool public whitelistIsActive = false;
+
+    mapping(address => bool) public whitelist;
+
+    /**
+     * @param _name NFT Name
+     * @param _symbol NFT Symbol
+     * @param limit Wallet Limit
+     * @param price Initial Price | precision:18
+     * @param maxSupply Maximum # of NFTs
+     */
+    constructor(
+        string memory _name,
+        string memory _symbol,
+        // string memory _uri,
+        string memory _ipfsprefix,
+        uint256 limit,
+        uint256 price,
+        uint256 maxSupply
+    ) payable ERC721(_name, _symbol) {
+        // _baseURIextended = _uri;
+        _ipfsPrefix = _ipfsprefix;
+        walletLimit = limit;
+        currentPrice = price;
+        MAX_SUPPLY = maxSupply;
     }
 
-    modifier isMintOpen() {
-        require(mintOpen, "Minting is not enabled");
-        _;
-    }
+    /**
+     * @dev An external method for users to purchase and mint NFTs. Requires that the sale
+     * is active, that the whitelist is either inactive or the user is whitelisted, that
+     * the minted NFTs will not exceed the `MAX_SUPPLY`, that the user's `walletLimit` will
+     * not be exceeded, and that a sufficient payable value is sent.
+     * @param amount The number of NFTs to mint.
+     * Recipient needs to approve this contract to spend their tokens on their behalf.
+     * This contract is built with the Crossmint specification
+     */
+    function freeMint(uint256 amount, address recipient) external {
+        uint256 ts = totalSupply();
+        uint256 minted = balanceOf(recipient);
 
-    function mintTeamsAllocation(address _receiver) external onlyOwner {
-        require(totalMinted < TEAM_RESERVE, "Team reserve already minted");
-        for (uint256 i = 0; i < TEAM_RESERVE; i++) {
-            uint256 tokenId = ++totalMinted;
-            _mint(_receiver, bytes32(tokenId), false, "");
-        }
-    }
-
-    function burn(bytes32[] memory _tokenIds, bytes[] memory _datas) external {
-        for (uint256 i = 0; i < _tokenIds.length; i++) {
-            if (!_isOperatorOrOwner(msg.sender, _tokenIds[i]))
-                revert LSP8NotTokenOperator(_tokenIds[i], msg.sender);
-            _burn(_tokenIds[i], _datas[i]);
-        }
-    }
-
-    function mint(uint256 _amount) external payable nonReentrant isMintOpen {
-        if (totalMinted + _amount > MAX_SUPPLY)
-            revert BPunxMintingLimitExceeded(_amount);
-        if (_amount > MAX_MINTABLE) revert BPunxMintingLimitExceeded(_amount);
-        if (msg.value != PRICE * _amount)
-            revert BPunxMintingPriceNotMet(_amount);
-        for (uint256 i = 0; i < _amount; i++) {
-            uint256 tokenId = ++totalMinted;
-            _mint(msg.sender, bytes32(tokenId), false, "");
-        }
-    }
-
-    function chillMint(
-        uint256 _amount
-    ) external payable nonReentrant isMintOpen {
-        if (totalMinted + _amount > MAX_SUPPLY)
-            revert BPunxMintingLimitExceeded(_amount);
-        if (_amount > MAX_MINTABLE) revert BPunxMintingLimitExceeded(_amount);
-
-        _chillContract.transfer(
-            msg.sender,
-            owner(),
-            (CHILLPRICE * _amount),
-            false,
-            ""
+        require(
+            !whitelistIsActive || (whitelist[msg.sender] && whitelist[recipient]),
+            "Address must be whitelisted."
         );
+        require(saleIsActive, "Sale must be active to mint tokens");
+        require(ts + amount <= MAX_SUPPLY, "Purchase would exceed max tokens");
+        require(amount + minted <= walletLimit, "Exceeds wallet limit");
 
-        for (uint256 i = 0; i < _amount; i++) {
-            uint256 tokenId = ++totalMinted;
-            _mint(msg.sender, bytes32(tokenId), false, "");
+       
+       
+        for (uint256 i = 0; i < amount; i++) {
+            _safeMint(recipient, ts + i);
         }
     }
 
-    function setMintStatus(bool _mintOpen) external onlyOwner {
-        mintOpen = _mintOpen;
+    function donationMint(address recipient, uint256 amount, uint256 donation) external payable {
+   
+    uint256 ts = totalSupply();
+    uint256 minted = balanceOf(recipient);
+
+    require(
+        !whitelistIsActive || (whitelist[msg.sender] && whitelist[recipient]),
+        "Address must be whitelisted."
+    );
+    require(saleIsActive, "Sale must be active to mint tokens");
+    require(ts + amount <= MAX_SUPPLY, "Purchase would exceed max tokens");
+    require(amount + minted <= walletLimit, "Exceeds wallet limit");
+    require(donation > 0, "Donation amount must be greater than zero");
+
+    require(msg.value == donation, "Sent Eth does not match the donation amount");
+    for (uint256 i = 0; i < amount; i++) {
+                _safeMint(recipient, ts + i);
+            }
+}
+
+
+    /**
+     * @dev A way for the owner to reserve a specifc number of NFTs without having to
+     * interact with the sale.
+     * @param n The number of NFTs to reserve.
+     */
+    function reserve(uint256 n) external onlyOwner {
+        uint256 supply = totalSupply();
+        require(supply + n <= MAX_SUPPLY, "Purchase would exceed max tokens");
+        for (uint256 i = 0; i < n; i++) {
+            _safeMint(msg.sender, supply + i);
+        }
     }
 
-    function setBaseURI(string memory _baseURI) external onlyOwner {
-        _setData(
-            _LSP8_TOKEN_METADATA_BASE_URI,
-            abi.encodePacked(bytes8(0), bytes(_baseURI))
+/**
+ * @dev  A way for the owner to set how the proceeds are divided when withdrawn
+ * @param addresses the addresses to transfer the proceeds to
+ * @param percents the shares each address get
+ */
+
+    function setPayout(
+        address[] calldata addresses,
+        uint256[] calldata percents
+    ) external onlyOwner {
+        uint256 totalPercent;
+
+        payoutAddress = addresses;
+        payoutPercent = percents;
+        require(
+            addresses.length <= 5 && percents.length == addresses.length,
+            "Invalid payout data"
+        );
+        for (uint256 i = 0; i < addresses.length; i++) {
+            require(
+                payoutAddress[i] != address(0),
+                "Payout address cannot be 0x0"
+            );
+            totalPercent += percents[i];
+            payoutAddress[i] = addresses[i];
+            payoutPercent[i] = percents[i];
+        }
+        require(
+            totalPercent == 100,
+            "Invalid share amount. Shares must add up to 100%"
         );
     }
 
+    /**
+     * @dev A way for the owner to withdraw all proceeds from the sale.
+     */
     function withdraw() external onlyOwner {
-        Address.sendValue(payable(msg.sender), address(this).balance);
+    // Get the contract's Ether balance
+    uint256 etherBalance = address(this).balance;
+
+    // Iterate over payout addresses
+    for (uint256 i = 0; i < payoutAddress.length; i++) {
+        // Calculate the amount of Ether to transfer
+        uint256 etherAmountToTransfer = etherBalance * payoutPercent[i] / 100;
+
+    // Transfer the Ether
+    (bool success, ) = payable(payoutAddress[i]).call{value: etherAmountToTransfer}("");
+    require(success, "Ether transfer failed");
     }
+}
+
+    function setIPFSPrefix(string memory ipfsprefix) external onlyOwner {
+        _ipfsPrefix = ipfsprefix;
+    }
+
+    /**
+     * @dev Sets whether or not the NFT sale is active.
+     * @param isActive Whether or not the sale will be active.
+     */
+    function setSaleIsActive(bool isActive) external onlyOwner {
+        saleIsActive = isActive;
+    }
+
+    /**
+     * @dev Sets the price of each NFT during the initial sale.
+     * @param price The price of each NFT during the initial sale | precision:18
+     */
+    function setCurrentPrice(uint256 price) external onlyOwner {
+        currentPrice = price;
+    }
+
+    /**
+     * @dev Sets the maximum number of NFTs that can be sold to a specific address.
+     * @param limit The maximum number of NFTs that be bought by a wallet.
+     */
+    function setWalletLimit(uint256 limit) external onlyOwner {
+        walletLimit = limit;
+    }
+
+    /**
+     * @dev Sets whether or not the NFT sale whitelist is active.
+     * @param active Whether or not the whitelist will be active.
+     */
+    function setWhitelistActive(bool active) external onlyOwner {
+        whitelistIsActive = active;
+    }
+
+    /**
+     * @dev Adds an address to the NFT sale whitelist.
+     * @param wallet The wallet to add to the whitelist.
+     */
+    function addToWhitelist(address wallet) external onlyOwner {
+        whitelist[wallet] = true;
+    }
+
+    /**
+     * @dev Adds an array of addresses to the NFT sale whitelist.
+     * @param wallets The wallets to add to the whitelist.
+     */
+    function addManyToWhitelist(address[] calldata wallets) external onlyOwner {
+        for (uint256 i = 0; i < wallets.length; i++) {
+            whitelist[wallets[i]] = true;
+        }
+    }
+
+    /**
+     * @dev Removes an address from the NFT sale whitelist.
+     * @param wallet The wallet to remove from the whitelist.
+     */
+    function removeFromWhitelist(address wallet) external onlyOwner {
+        delete whitelist[wallet];  
+    }
+
+    // Required Overrides
+
+    function _baseURI() internal view virtual override returns (string memory) {
+        return string(abi.encodePacked(_ipfsPrefix, "/"));
+    }
+
+    function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
+    require(_exists(tokenId), "ERC721Metadata: URI query for nonexistent token");
+
+    string memory baseURI = _baseURI();
+    return bytes(baseURI).length > 0? string(abi.encodePacked(baseURI, Strings.toString(tokenId), ".json")) : "";
+}
+
 
     function _beforeTokenTransfer(
         address from,
         address to,
-        bytes32 tokenId,
-        bytes memory data
-    )
-        internal
-        virtual
-        override(LSP8Enumerable, LSP8IdentifiableDigitalAssetCore)
+        uint256 tokenId
+    ) internal override(ERC721, ERC721Enumerable) {
+        super._beforeTokenTransfer(from, to, tokenId);
+    }
+
+    function supportsInterface(bytes4 interfaceId)
+        public
+        view
+        override(ERC721, ERC721Enumerable)
+        returns (bool)
     {
-        super._beforeTokenTransfer(from, to, tokenId, data);
+        return super.supportsInterface(interfaceId);
     }
 }

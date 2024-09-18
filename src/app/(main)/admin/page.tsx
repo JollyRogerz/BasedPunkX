@@ -1,6 +1,6 @@
 "use client";
 
-import ConnectButton from "@/components/ConnectButton";
+import ConnectButton from "@/components/ui/ConnectButton";
 import Button from "@/components/ui/Button";
 import { admin_address, contract_address } from "@/config/consts";
 import { config } from "@/config/wagmi";
