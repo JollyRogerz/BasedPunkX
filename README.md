@@ -11,7 +11,7 @@
 </div>
 <br>
 <div align="center">
-    <a href="https://twitter.com/mrmaiko">mrmaiko</a> | <a href="https://twitter.com/FyzzNFT">FyzzNFT</a> | <a href="https://twitter.com/Official_Chonii">Official_Chonii</a> | <a href="https://twitter.com/aurealarcon">aurealarcon</a> | <a href="https://twitter.com/b00ste_lyx">b00ste_lyx</a> | <a href="https://twitter.com/tantodefi">tantodefi</a> | <a href="https://twitter.com/ChudBrass">ChudBrass</a> | <a href="https://twitter.com/zeroxLucky">zeroxLucky</a>
+    <a href="https://twitter.com/mrmaiko">mrmaiko</a> | <a href="https://twitter.com/FyzzNFT">FyzzNFT</a> | <a href="https://twitter.com/Official_Chonii">Official_Chonii</a> | <a href="https://twitter.com/aurealarcon">aurealarcon</a> | <a href="https://twitter.com/b00ste_lyx">b00ste_lyx</a> | <a href="https://twitter.com/tantodefi">tantodefi</a> | <a href="https://twitter.com/ChudBrass">ChudBrass</a> | <a href="https://twitter.com/zeroxLucky">zeroxLucky</a> | <a href="https://x.com/Jolly_Voyager">JollyV</a> 
 </div>
 <br>
 
@@ -66,19 +66,6 @@
                        :--------:===+******************************+********+
                        =+++++++==+***************************************####.
                       .+++++++++==*##****####****####****###*****#**********#=           
-
-
-
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
-
-
-
-
-
-
-
-
 
 This  is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
