@@ -45,7 +45,7 @@ const EnableMintButton = () => {
         const provider = await getEthersSigner(config);
         const contract = new ethers.Contract(
           contract_address,
-          abi.abi,
+          abi,
           provider
         );
         await contract
