@@ -13,7 +13,7 @@ export const config = createConfig({
           id: "windowProvider",
           name: "Window Provider",
           provider(window?: Window) {
-            return window?.lukso;
+            return window?.ethereum;
           },
         };
       },
