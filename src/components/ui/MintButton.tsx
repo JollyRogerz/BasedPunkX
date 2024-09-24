@@ -28,7 +28,7 @@ const MintButton = () => {
         // init contract
         const contract = new ethers.Contract(
           contract_address,
-          abi.abi,
+          abi,
           provider
         );
 

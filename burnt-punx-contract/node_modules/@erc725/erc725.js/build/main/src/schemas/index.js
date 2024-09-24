@@ -1,0 +1,31 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.LSP17Schema = exports.LSP12Schema = exports.LSP10Schema = exports.LSP9Schema = exports.LSP8Schema = exports.LSP6Schema = exports.LSP5Schema = exports.LSP4LegacySchema = exports.LSP4Schema = exports.LSP3Schema = exports.LSP1Schema = void 0;
+const LSP1UniversalReceiverDelegate_json_1 = __importDefault(require("../../schemas/LSP1UniversalReceiverDelegate.json"));
+const LSP3ProfileMetadata_json_1 = __importDefault(require("../../schemas/LSP3ProfileMetadata.json"));
+const LSP4DigitalAsset_json_1 = __importDefault(require("../../schemas/LSP4DigitalAsset.json"));
+const LSP4DigitalAssetLegacy_json_1 = __importDefault(require("../../schemas/LSP4DigitalAssetLegacy.json"));
+const LSP5ReceivedAssets_json_1 = __importDefault(require("../../schemas/LSP5ReceivedAssets.json"));
+const LSP6KeyManager_json_1 = __importDefault(require("../../schemas/LSP6KeyManager.json"));
+const LSP8IdentifiableDigitalAsset_json_1 = __importDefault(require("../../schemas/LSP8IdentifiableDigitalAsset.json"));
+const LSP9Vault_json_1 = __importDefault(require("../../schemas/LSP9Vault.json"));
+const LSP10ReceivedVaults_json_1 = __importDefault(require("../../schemas/LSP10ReceivedVaults.json"));
+const LSP12IssuedAssets_json_1 = __importDefault(require("../../schemas/LSP12IssuedAssets.json"));
+const LSP17ContractExtension_json_1 = __importDefault(require("../../schemas/LSP17ContractExtension.json"));
+exports.LSP1Schema = LSP1UniversalReceiverDelegate_json_1.default;
+exports.LSP3Schema = LSP3ProfileMetadata_json_1.default;
+exports.LSP4Schema = LSP4DigitalAsset_json_1.default;
+exports.LSP4LegacySchema = LSP4DigitalAssetLegacy_json_1.default;
+exports.LSP5Schema = LSP5ReceivedAssets_json_1.default;
+exports.LSP6Schema = LSP6KeyManager_json_1.default;
+exports.LSP8Schema = LSP8IdentifiableDigitalAsset_json_1.default;
+exports.LSP9Schema = LSP9Vault_json_1.default;
+exports.LSP10Schema = LSP10ReceivedVaults_json_1.default;
+exports.LSP12Schema = LSP12IssuedAssets_json_1.default;
+exports.LSP17Schema = LSP17ContractExtension_json_1.default;
+const AllSchemas = exports.LSP1Schema.concat(exports.LSP3Schema, exports.LSP4Schema, exports.LSP4LegacySchema, exports.LSP5Schema, exports.LSP6Schema, exports.LSP8Schema, exports.LSP9Schema, exports.LSP10Schema, exports.LSP12Schema, exports.LSP17Schema);
+exports.default = AllSchemas;
+//# sourceMappingURL=index.js.map

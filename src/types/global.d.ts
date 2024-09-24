@@ -4,6 +4,7 @@
 interface Window {
   ethereum: any;
   lukso: any;
+  base: any;
 }
 
 type LSP3ProfileT = {
