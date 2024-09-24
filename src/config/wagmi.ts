@@ -1,13 +1,12 @@
 import { http, createConfig } from "wagmi";
-import { lukso } from "wagmi/chains";
+import { baseSepolia } from "wagmi/chains";
 import { injected } from "wagmi/connectors";
 
 export const config = createConfig({
-  chains: [lukso],
+  chains: [baseSepolia],
   multiInjectedProviderDiscovery: false,
   connectors: [
     injected({
-      // force lukso provider `Universal Profile`
       // @ts-expect-error
       target() {
         return {
@@ -22,7 +21,7 @@ export const config = createConfig({
   ],
   ssr: true,
   transports: {
-    [lukso.id]: http(),
+    [baseSepolia.id]: http(),
   },
 });
 

@@ -4,7 +4,7 @@ import { useMinter } from "../contexts/MinterContext";
 import { getEthersSigner } from "@/utils/web3";
 import { config } from "@/config/wagmi";
 import { ethers } from "ethers";
-import { chill_address, contract_address } from "@/config/consts";
+import {contract_address } from "@/config/consts";
 import abi from "@/config/abi.json";
 import { useTransition } from "react";
 import { toast } from "sonner";
@@ -13,7 +13,7 @@ import lsp7 from "@lukso/lsp-smart-contracts/artifacts/LSP7DigitalAsset.json";
 
 const MintButton = () => {
   const account = useAccount();
-  const { count, chill, setFrameImage, error } = useMinter();
+  const { count, setFrameImage, error } = useMinter();
   const [isPending, startTransition] = useTransition();
 
   // Mint function
@@ -62,74 +62,74 @@ const MintButton = () => {
     });
   };
 
-  // Chill Mint Function
-  const chillMint = () => {
-    startTransition(async () => {
-      setFrameImage("");
-      try {
-        // Calculate total $chill
-        const total = parseInt(count) * 6969;
-        const provider = await getEthersSigner(config);
+  // // Chill Mint Function
+  // const chillMint = () => {
+  //   startTransition(async () => {
+  //     setFrameImage("");
+  //     try {
+  //       // Calculate total $chill
+  //       const total = parseInt(count) * 6969;
+  //       const provider = await getEthersSigner(config);
 
-        // init chill contract
-        const access = new ethers.Contract(chill_address, lsp7.abi, provider);
+  //       // init chill contract
+  //       const access = new ethers.Contract(chill_address, lsp7.abi, provider);
 
-        try {
-          // authorize chill use
-          await access.authorizeOperator(
-            contract_address,
-            ethers.parseEther(`${total}`),
-            "0x"
-          );
-        } catch (e) {
-          toast.error("Error authorizing chill");
-          return;
-        }
+  //       try {
+  //         // authorize chill use
+  //         await access.authorizeOperator(
+  //           contract_address,
+  //           ethers.parseEther(`${total}`),
+  //           "0x"
+  //         );
+  //       } catch (e) {
+  //         toast.error("Error authorizing chill");
+  //         return;
+  //       }
 
-        // init contract
-        const contract = new ethers.Contract(
-          contract_address,
-          abi.abi,
-          provider
-        );
+  //       // init contract
+  //       const contract = new ethers.Contract(
+  //         contract_address,
+  //         abi.abi,
+  //         provider
+  //       );
 
-        // call chill mint
-        await contract
-          .chillMint(ethers.toBigInt(parseInt(count)), {
-            gasLimit: 300000,
-          })
-          .then(async (receipt) => {
-            toast.success("Minted!");
+  //       // call chill mint
+  //       await contract
+  //         .chillMint(ethers.toBigInt(parseInt(count)), {
+  //           gasLimit: 300000,
+  //         })
+  //         .then(async (receipt) => {
+  //           toast.success("Minted!");
 
-            // give time for transaction/block
-            // to process
-            await new Promise((resolve) => setTimeout(resolve, 10000));
+  //           // give time for transaction/block
+  //           // to process
+  //           await new Promise((resolve) => setTimeout(resolve, 10000));
 
-            // get last token minted
-            const tokens = await contract.tokenIdsOf(account.address);
-            const token = tokens[tokens.length - 1];
+  //           // get last token minted
+  //           const tokens = await contract.tokenIdsOf(account.address);
+  //           const token = tokens[tokens.length - 1];
 
-            // set display image as last owned token
-            setFrameImage(
-              `https://ipfs.filebase.io/ipfs/QmSKbCkmib8koVyYA2Xum3hngzNCLVijFkiQBg23VHjcMV/BurntPunX_${parseInt(
-                token
-              )}.png`
-            );
-          })
-          .catch((e) => {
-            toast.error("Error minting");
-          });
-      } catch (e) {
-        return;
-      }
-    });
-  };
+  //           // set display image as last owned token
+  //           setFrameImage(
+  //             `https://ipfs.filebase.io/ipfs/QmSKbCkmib8koVyYA2Xum3hngzNCLVijFkiQBg23VHjcMV/BurntPunX_${parseInt(
+  //               token
+  //             )}.png`
+  //           );
+  //         })
+  //         .catch((e) => {
+  //           toast.error("Error minting");
+  //         });
+  //     } catch (e) {
+  //       return;
+  //     }
+  //   });
+  // };
 
   if (account.isConnected) {
     return (
       <>
         <button
-          onClick={chill ? chillMint : mint}
+          onClick={mint}
           disabled={isPending || error}
           className="max-h-12 digital text-sm tracking-widest gap-1 grow p-2 text-center border text-gold col-span-4 rounded-md flex items-center justify-center"
         >
