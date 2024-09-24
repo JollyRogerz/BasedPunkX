@@ -29,6 +29,7 @@
     "sharp": "^0.33.2",
     "sonner": "^1.4.0",
     "styled-components": "^6.1.8",
+    "vercel": "^37.5.4",
     "viem": "2.x",
     "wagmi": "^2.5.6"
   },
