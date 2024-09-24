@@ -85,7 +85,7 @@ const DisableMintButton = () => {
         const provider = await getEthersSigner(config);
         const contract = new ethers.Contract(
           contract_address,
-          abi.abi,
+          abi,
           provider
         );
         await contract
@@ -125,7 +125,7 @@ const Withdraw = () => {
         const provider = await getEthersSigner(config);
         const contract = new ethers.Contract(
           contract_address,
-          abi.abi,
+          abi,
           provider
         );
         await contract
@@ -165,7 +165,7 @@ const MintAllocation = ({ address }: { address: string }) => {
         const provider = await getEthersSigner(config);
         const contract = new ethers.Contract(
           contract_address,
-          abi.abi,
+          abi,
           provider
         );
         await contract
